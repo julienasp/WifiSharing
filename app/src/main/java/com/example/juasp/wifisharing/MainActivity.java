@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = "MA-";
     private CheckBox checkBoxPassword = null;
     private EditText editTextPassword = null;
+    private Spinner spinnerSSID = null;
 
     protected void activatingWifi(){
         Log.d(TAG+"activatingWifi", "executing activatingWifi()...");
@@ -77,13 +79,14 @@ public class MainActivity extends AppCompatActivity {
             else activatingWifi();
         }
     }
+
     protected void hydratingSpinnerSSID(){
         Log.d(TAG+"hydratingSpinnerSSID", "executing hydratingSpinnerSSID()...");
         List<ScanResult> results = getWifiScanResult();
 
         List<String> spinnerArray =  new ArrayList<String>();
         Log.d(TAG+"hydratingSpinnerSSID", results.toString());
-
+        spinnerArray.add("");
         for (ScanResult result : results) {
             spinnerArray.add(result.SSID);
             Log.d(TAG+"hydratingSpinnerSSID", "the SSID : " + result.SSID + " was added to the spinnerSSID.");
@@ -106,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         checkBoxPassword = (CheckBox) findViewById(R.id.checkBoxPassword);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+        spinnerSSID = (Spinner) findViewById(R.id.spinner_ssid);
 
         checkBoxPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -115,6 +119,17 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     editTextPassword.setInputType(129);
                 }
+            }
+        });
+
+        spinnerSSID.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String ssidName = (String) spinnerSSID.getSelectedItem();
+                Log.d(TAG + "setOnItemSelected", "ssid selectionné est: " + ssidName);
+            }
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                return;
             }
         });
 
