@@ -29,12 +29,53 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:text="Choisir un SSID"
+        android:text="Choisir un SSID accessible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="34dp"
         android:id="@+id/textView_ssid"
         android:layout_alignBottom="@+id/spinner_ssid"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="Informations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
+        android:id="@+id/textView"
+        android:layout_below="@+id/spinner_ssid"
+        android:layout_centerHorizontal="true" />
+
+    <CheckBox
+        android:text="Afficher MDP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Mot de passe"
+        android:id="@+id/checkBoxPassword"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/textview_title" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/editTextPassword"
+        android:contentDescription="Mot de passe"
+        android:layout_alignBottom="@+id/checkBoxPassword"
+        android:layout_alignEnd="@+id/textView"
+        android:hint="Mot de passe" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="none"
+        android:text="Type de sécurité"
+        android:ems="10"
+        android:id="@+id/editTextSecurity"
+        android:editable="false"
+        android:layout_below="@+id/textView"
+        android:layout_alignEnd="@+id/textView" />
 
 </RelativeLayout>

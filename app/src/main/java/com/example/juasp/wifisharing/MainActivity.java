@@ -17,13 +17,20 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.text.InputType;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
 
     private String TAG = "MA-";
+    private CheckBox checkBoxPassword = null;
+    private EditText editTextPassword = null;
 
     protected void activatingWifi(){
         Log.d(TAG+"activatingWifi", "executing activatingWifi()...");
@@ -96,6 +103,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        checkBoxPassword = (CheckBox) findViewById(R.id.checkBoxPassword);
+        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+
+        checkBoxPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    editTextPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                } else {
+                    editTextPassword.setInputType(129);
+                }
+            }
+        });
 
         hydratingSpinnerSSID();
 
