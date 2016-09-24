@@ -1,9 +1,12 @@
 package com.example.juasp.wifisharing;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,36 +23,63 @@ import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String TAG = "MA-";
+
     protected void activatingWifi(){
+        Log.d(TAG+"activatingWifi", "executing activatingWifi()...");
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            Log.d(TAG+"activatingWifi()", "waiting on callback");
+        }
+
         WifiManager mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         if (mWifiManager.isWifiEnabled() == false)
         {
             Toast.makeText(getApplicationContext(), "Activating WiFi...", Toast.LENGTH_LONG).show();
             mWifiManager.setWifiEnabled(true);
-            Log.d("activatingWifi()", "activatingWifi: WiFi is now active.");
+            Log.d(TAG+"activatingWifi", "activatingWifi: WiFi is now active.");
         }
         else{
-            Log.d("activatingWifi()", "activatingWifi: WiFi was already activated.");
+            Log.d(TAG+"activatingWifi", "activatingWifi: WiFi was already activated.");
         }
     }
 
     protected List<ScanResult> getWifiScanResult(){
+        Log.d(TAG+"getWifiScanResult", "executing getWifiScanResult()...");
         //Preconditions
-        activatingWifi(); //Need wifi on
+        activatingWifi(); //Activating Wifi + Permissions
 
         WifiManager mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
         List<ScanResult> results = mWifiManager.getScanResults();
 
+        Log.d(TAG+"getWifiScanResult", results.toString());
         return results;
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG+"PermissionsResult:", "executing onRequestPermissionsResult() ...");
+        Log.d(TAG+"PermissionsResult:", "permissions[] = " + permissions.toString());
+        Log.d(TAG+"PermissionsResult:", "grantResults[] = " + grantResults.toString());
+        if (requestCode == 1) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hydratingSpinnerSSID();
+            }
+            else activatingWifi();
+        }
+    }
     protected void hydratingSpinnerSSID(){
+        Log.d(TAG+"hydratingSpinnerSSID", "executing hydratingSpinnerSSID()...");
         List<ScanResult> results = getWifiScanResult();
 
         List<String> spinnerArray =  new ArrayList<String>();
+        Log.d(TAG+"hydratingSpinnerSSID", results.toString());
 
         for (ScanResult result : results) {
             spinnerArray.add(result.SSID);
-            Log.d("hydratingSpinnerSSID()", "the SSID : " + result.SSID + " was added to the spinnerSSID.");
+            Log.d(TAG+"hydratingSpinnerSSID", "the SSID : " + result.SSID + " was added to the spinnerSSID.");
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
