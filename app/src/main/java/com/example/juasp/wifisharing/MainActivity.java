@@ -32,7 +32,23 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = "MA-";
     private CheckBox checkBoxPassword = null;
     private EditText editTextPassword = null;
+    private EditText editTextSecurity = null;
     private Spinner spinnerSSID = null;
+    private HashMap<String,String> ssidSecurityTypeMap = new HashMap<>();
+
+    private String findSecurityType(String c){
+
+        if (c.contains("WPA2")) {
+            return "WPA2";
+        }
+        else if (c.contains("WPA")) {
+            return "WPA";
+        }
+        else if (c.contains("WEP")) {
+            return "WEP";
+        }
+        return "OPEN";
+    }
 
     protected void activatingWifi(){
         Log.d(TAG+"activatingWifi", "executing activatingWifi()...");
@@ -90,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         for (ScanResult result : results) {
             spinnerArray.add(result.SSID);
             Log.d(TAG+"hydratingSpinnerSSID", "the SSID : " + result.SSID + " was added to the spinnerSSID.");
+            ssidSecurityTypeMap.put(result.SSID,findSecurityType(result.capabilities));
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -110,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         checkBoxPassword = (CheckBox) findViewById(R.id.checkBoxPassword);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         spinnerSSID = (Spinner) findViewById(R.id.spinner_ssid);
+        editTextSecurity = (EditText) findViewById(R.id.editTextSecurity);
 
         checkBoxPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -127,6 +145,14 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String ssidName = (String) spinnerSSID.getSelectedItem();
                 Log.d(TAG + "setOnItemSelected", "ssid selectionné est: " + ssidName);
+                if("".equals(ssidName)){
+                    editTextPassword.setText("");
+                    editTextSecurity.setText("");
+                }
+                else{
+                    editTextPassword.setText("");
+                    editTextSecurity.setText(ssidSecurityTypeMap.get(ssidName));
+                }
             }
             public void onNothingSelected(AdapterView<?> adapterView) {
                 return;
