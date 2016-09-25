@@ -41,6 +41,8 @@ import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String NFC_TOKEN_MIME_TYPE = "application/vnd.wfa.wsc";
+
     private String TAG = "MA-";
     private CheckBox checkBoxPassword = null;
     private EditText editTextPassword = null;
@@ -135,6 +137,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private NdefRecord createRecord(String text) throws UnsupportedEncodingException {
+
+
+        //URIs in the format of wifi://[network ssid]/[wep|wpa|open]/[network key] TO CONFIRM
+        WifiManager mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         //create the message in according with the standard
         String lang = "en";
