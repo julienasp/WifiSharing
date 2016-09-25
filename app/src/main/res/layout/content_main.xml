@@ -79,4 +79,13 @@
         android:layout_below="@+id/textView"
         android:layout_alignEnd="@+id/textView" />
 
+    <Button
+        android:text="Écrire sur le TAG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="72dp"
+        android:id="@+id/button_write"
+        android:layout_below="@+id/checkBoxPassword"
+        android:layout_alignStart="@+id/textview_title" />
+
 </RelativeLayout>

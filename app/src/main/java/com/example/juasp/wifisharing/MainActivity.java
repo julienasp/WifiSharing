@@ -2,10 +2,14 @@ package com.example.juasp.wifisharing;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.nfc.FormatException;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -25,6 +30,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.text.InputType;
+import android.app.PendingIntent;
+
+import java.io.IOException;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTextSecurity = null;
     private Spinner spinnerSSID = null;
     private HashMap<String,String> ssidSecurityTypeMap = new HashMap<>();
+    private PendingIntent mPendingIntent = null;
+    private NfcAdapter nfcAdapter = null;
+    private Tag mytag;
+    private IntentFilter writeTagFilters[];
+    private Context ctx;
 
     private String findSecurityType(String c){
 
@@ -123,11 +136,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ctx = this;
+
 
         checkBoxPassword = (CheckBox) findViewById(R.id.checkBoxPassword);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         spinnerSSID = (Spinner) findViewById(R.id.spinner_ssid);
         editTextSecurity = (EditText) findViewById(R.id.editTextSecurity);
+        Button btnWrite = (Button) findViewById(R.id.button_write);
+
+        btnWrite.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if(mytag==null){
+                        Toast.makeText(ctx, "Error, tag not found!", Toast.LENGTH_LONG ).show();
+                    }else{
+                        write("test",mytag);
+                        Toast.makeText(ctx, "Writing was successful", Toast.LENGTH_LONG ).show();
+                    }
+                } catch (IOException e) {
+                    Toast.makeText(ctx, "Error, IOException", Toast.LENGTH_LONG ).show();
+                    e.printStackTrace();
+                } catch (FormatException e) {
+                    Toast.makeText(ctx, "Error, FormatException" , Toast.LENGTH_LONG ).show();
+                    e.printStackTrace();
+                }
+            }
+        });
 
         checkBoxPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -161,13 +198,44 @@ public class MainActivity extends AppCompatActivity {
 
         hydratingSpinnerSSID();
 
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if(nfcAdapter != null && nfcAdapter.isEnabled()){
             Toast.makeText(this,"NFC available!", Toast.LENGTH_LONG).show();
         }
         else{
             Toast.makeText(this,"NFC not available!", Toast.LENGTH_LONG).show();
+        }
+
+        mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+                getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+        tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
+        writeTagFilters = new IntentFilter[] { tagDetected };
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (nfcAdapter != null) {
+            nfcAdapter.disableForegroundDispatch(this);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        nfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){
+            mytag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            Toast.makeText(this, this.getString(R.string.ok_detection) + mytag.toString(), Toast.LENGTH_LONG ).show();
         }
     }
 
